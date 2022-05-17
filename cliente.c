@@ -75,6 +75,7 @@ int ComprarBoletos(int disponibles)
 
 int main(void)
 {
+   // cliente no funciona correctamente
    int boletos_cantidad, i, *asientos;
    int semaforo_mutex, semaforo_estado, semaforo_espacio, memoria1;
    key_t llave1, llave2, llave3, llave_estado;
