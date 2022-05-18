@@ -11,7 +11,13 @@
 #define PERMISOS 0644
 #define N 5
 
-int Crea_semaforo(key_t llave,int valor_inicial)
+/*
+ * Se define un sem_t que es un entero para
+ * el mejor manejo de variables del programa
+ */
+typedef int sem_t;
+
+int crea_semaforo(key_t llave,int valor_inicial)
 {
    int semid=semget(llave,1,IPC_CREAT|PERMISOS);
    if(semid==-1)
@@ -38,12 +44,12 @@ void *Hilo1(void *argumentos)
 {
    // int semaforo_inicia;
    // key_t llave_inicia = ftok("inicia", 't');
-   // semaforo_inicia = Crea_semaforo(llave_inicia, 0);
+   // semaforo_inicia = crea_semaforo(llave_inicia, 0);
    // down(semaforo_inicia);
 
    // int semaforo_termina;
    // key_t llave_termina = ftok("termina", 'u');
-   // semaforo_termina = Crea_semaforo(llave_termina, 0);
+   // semaforo_termina = crea_semaforo(llave_termina, 0);
    // down(semaforo_termina);
    
    // int semaforo_wait;
@@ -61,7 +67,7 @@ void *Hilo1(void *argumentos)
 int main(void) 
 {
    int memoria1, *asientos;
-   int semaforo_estado;
+   sem_t semaforo_estado, semaforo_mutex;
    key_t llave3, llave_estado;
 
    /***************************************************/
@@ -72,8 +78,8 @@ int main(void)
     * para que los clientes solo accedan al valor que 
     * se tenga en ese momento.
     */
-   key_t llave1 = ftok("Prueba1", 'k'); 
-   int semaforo_mutex = Crea_semaforo(llave1, 1);
+   key_t llave_mutex = ftok("Mutex", 'k'); 
+   semaforo_mutex = crea_semaforo(llave_mutex, 1);
    down(semaforo_mutex);
 
    /***************************************************/
@@ -85,9 +91,9 @@ int main(void)
    *asientos = N;
 
    llave_estado = ftok("Estado", 'n');
-   semaforo_estado = Crea_semaforo(llave_estado, 0);
+   semaforo_estado = crea_semaforo(llave_estado, 0);
    int llave_stop = ftok("PruebaStop", 'p'); 
-   int semaforo_stop = Crea_semaforo(llave_stop, 0);
+   int semaforo_stop = crea_semaforo(llave_stop, 0);
    
    while (1)
    {
