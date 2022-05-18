@@ -10,7 +10,13 @@
 #define PERMISOS 0644
 #define N 5
 
-int Crea_semaforo(key_t llave,int valor_inicial)
+/*
+ * Se define un sem_t que es un entero para
+ * el mejor manejo de variables del programa
+ */
+typedef int sem_t;
+
+int crea_semaforo(key_t llave,int valor_inicial)
 {
    int semid=semget(llave,1,IPC_CREAT|PERMISOS);
    if(semid==-1)
@@ -18,6 +24,18 @@ int Crea_semaforo(key_t llave,int valor_inicial)
       return -1;
    }
    semctl(semid,0,SETVAL,valor_inicial);
+   return semid;
+}
+
+int obtiene_semaforo(key_t llave)
+{
+   int semid=semget(llave,1,IPC_CREAT|PERMISOS);
+   if(semid==-1)
+   {
+      return -1;
+   }
+   semctl(semid,0,GETVAL,NULL);
+   printf("\nValor del semáforo: %d\n", semid);
    return semid;
 }
 
@@ -36,16 +54,16 @@ void up(int semid)
 int ComprarBoletos(int disponibles)
 {
    int i, cantidad;
-   int semaforo_inicia;
+   /*int semaforo_inicia;
    key_t llave_inicia = ftok("inicia", 't');
-   semaforo_inicia = Crea_semaforo(llave_inicia, 0);
+   semaforo_inicia = crea_semaforo(llave_inicia, 0);
    down(semaforo_inicia);
 
    int semaforo_termina;
    key_t llave_termina = ftok("termina", 't');
-   semaforo_termina = Crea_semaforo(llave_termina, 0);
+   semaforo_termina = crea_semaforo(llave_termina, 0);
    down(semaforo_termina);
-   /* semaforo_wait = semget(llave_wait,1,IPC_CREAT|PERMISOS);
+   semaforo_wait = semget(llave_wait,1,IPC_CREAT|PERMISOS);
    if(semaforo_wait == -1)
    {
       printf("El servidor no pudo completar la transacción");
@@ -75,37 +93,30 @@ int ComprarBoletos(int disponibles)
 
 int main(void)
 {
-   // cliente no funciona correctamente
    int boletos_cantidad, i, *asientos;
    int semaforo_mutex, semaforo_estado, semaforo_espacio, memoria1;
-   key_t llave1, llave2, llave3, llave_estado;
+   key_t llave2, llave3, llave_estado;
 
    llave_estado = ftok("Estado", 'n');
-   semaforo_estado = Crea_semaforo(llave_estado, 0);
-   down(semaforo_estado);
+   semaforo_estado = crea_semaforo(llave_estado, 0);
+   up(semaforo_estado);
 
    /***************************************************/
    /*     Semáforo Mutex para el paso al servidor     */
    /***************************************************/
-   llave1 = ftok("Prueba1", 'k'); 
-   // semaforo_mutex = Crea_semaforo(llave1, 1);
-   int semid=semget(llave1,1,IPC_CREAT|PERMISOS);
-   if(semid==-1)
-   {
-      return -1;
-   }
-   semaforo_mutex = semctl(semid,0,SETVAL,NULL);
+   key_t llave_mutex = ftok("Mutex", 'k'); 
+   semaforo_mutex = crea_semaforo(llave_mutex, 1);
    down(semaforo_mutex);     
 
    llave2 = ftok("Prueba2", 'l'); 
-   semaforo_espacio = Crea_semaforo(llave2,N);
+   semaforo_espacio = crea_semaforo(llave2,N);
    
    llave3 = ftok("Prueba3", 'o');
    memoria1 = shmget(llave3, sizeof(int), IPC_CREAT|0600);
    asientos = shmat(memoria1, 0, 0);
    
    int llave_stop = ftok("PruebaStop", 'p'); 
-   int semaforo_stop = Crea_semaforo(llave_stop, 1);
+   int semaforo_stop = crea_semaforo(llave_stop, 1);
    down(semaforo_stop);         
 
    boletos_cantidad = ComprarBoletos(*asientos);

@@ -44,21 +44,27 @@ int ComprarBoletos(int disponibles) {
     printf("Compra finalizada\n");
     return cantidad;
 }
+
 int main(void) {
     int boletos_cantidad, i, * asientos;
     int semaforo_mutex, semaforo_estado, semaforo_espacio, memoria1;
     key_t llave1, llave2, llave3, llave_estado;
+    
     llave_estado = ftok("Estado", 'n');
     semaforo_estado = Crea_semaforo(llave_estado, 0);
     up(semaforo_estado);
+
     llave1 = ftok("Prueba1", 'k');
     semaforo_mutex = Crea_semaforo(llave1, 1);
     down(semaforo_mutex);
+
     llave2 = ftok("Prueba2", 'l');
     semaforo_espacio = Crea_semaforo(llave2, N);
+
     llave3 = ftok("Prueba3", 'o');
     memoria1 = shmget(llave3, sizeof(int), IPC_CREAT | 0600);
     asientos = shmat(memoria1, 0, 0);
+
     int llave_stop = ftok("PruebaStop", 'p');
     int semaforo_stop = Crea_semaforo(llave_stop, 1);
     down(semaforo_stop);
