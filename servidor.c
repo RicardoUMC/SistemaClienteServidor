@@ -67,8 +67,8 @@ void *Hilo1(void *argumentos)
 int main(void) 
 {
    int memoria1, *asientos;
-   sem_t semaforo_estado, semaforo_mutex;
-   key_t llave3, llave_estado;
+   sem_t semaforo_encendido, semaforo_mutex;
+   key_t llave3, llave_encendido;
 
    /***************************************************/
    /*            Inicialización del Mutex             */
@@ -80,7 +80,6 @@ int main(void)
     */
    key_t llave_mutex = ftok("Mutex", 'k'); 
    semaforo_mutex = crea_semaforo(llave_mutex, 1);
-   down(semaforo_mutex);
 
    /***************************************************/
    /*  Memoria compartida para cantidad de asientos   */
@@ -90,21 +89,24 @@ int main(void)
    asientos = shmat(memoria1, 0, 0);
    *asientos = N;
 
-   llave_estado = ftok("Estado", 'n');
-   semaforo_estado = crea_semaforo(llave_estado, 0);
+   llave_encendido = ftok("Encendido", 'n');
+   semaforo_encendido = crea_semaforo(llave_encendido, 0);
    int llave_stop = ftok("PruebaStop", 'p'); 
    int semaforo_stop = crea_semaforo(llave_stop, 0);
    
    while (1)
    {
-      printf("\nSemáforo dormido (1)...\n");
-      down(semaforo_estado);
+      printf("\nServidor dormido (1)...\n");
+      down(semaforo_encendido);
 
       pthread_t id_hilo1;
 
       printf("\nCreacion del hilo...\n");
       pthread_create(&id_hilo1, NULL, Hilo1, NULL);
       printf("\nHilo creado. Esperando su finalizacion...\n");
+      printf("\nEsperando cliente...\n");
+      down(semaforo_stop);
+      printf("\nTermina cliente...\n");
       pthread_join(id_hilo1, NULL);
       printf("\nHilo finalizado...\n-----------------------------------------------------------------\n");
    }
@@ -113,7 +115,7 @@ int main(void)
    while (1)
    {
       printf("Servidor dormido...\n");
-      down(semaforo_estado);
+      down(semaforo_encendido);
       printf("Servidor despierto...\n");
       pthread_t id_hilo1;
       printf("\nCreacion del hilo...\n");

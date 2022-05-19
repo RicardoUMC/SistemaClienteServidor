@@ -58,19 +58,21 @@ int main(void)
     int llave_stop = ftok("PruebaStop", 'p');
     int semaforo_stop = Crea_semaforo(llave_stop, 0);
     
-while (1)
-{
-printf("Servidor dormido...\n");
-down(semaforo_estado);
-printf("Servidor despierto...\n");
-pthread_t id_hilo1;
-printf("\nCreacion del hilo...\n");
-pthread_create(&id_hilo1, NULL, Hilo1, NULL);
-printf("\nHilo creado. Esperando su finalizacion...\n");
-printf("\nEsperando cliente...\n");
-down(semaforo_stop);
-printf("\nTermina cliente...\n");
-pthread_join(id_hilo1, NULL);
-printf("\nHilo finalizado...\n-----------------------------------------------------------------\n");
-}
+    while (1)
+    {
+        printf("Servidor dormido...\n");
+        down(semaforo_estado);
+        printf("Servidor despierto...\n");
+
+        pthread_t id_hilo1;
+        
+        printf("\nCreacion del hilo...\n");
+        pthread_create(&id_hilo1, NULL, Hilo1, NULL);
+        printf("\nHilo creado. Esperando su finalizacion...\n");
+        printf("\nEsperando cliente...\n");
+        down(semaforo_stop);
+        printf("\nTermina cliente...\n");
+        pthread_join(id_hilo1, NULL);
+        printf("\nHilo finalizado...\n-----------------------------------------------------------------\n");
+    }
 }

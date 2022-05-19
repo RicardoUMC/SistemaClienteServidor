@@ -94,18 +94,18 @@ int ComprarBoletos(int disponibles)
 int main(void)
 {
    int boletos_cantidad, i, *asientos;
-   int semaforo_mutex, semaforo_estado, semaforo_espacio, memoria1;
-   key_t llave2, llave3, llave_estado;
+   sem_t semaforo_mutex, semaforo_encendido, semaforo_espacio, memoria1;
+   key_t llave2, llave3, llave_encendido;
 
-   llave_estado = ftok("Estado", 'n');
-   semaforo_estado = crea_semaforo(llave_estado, 0);
-   up(semaforo_estado);
+   llave_encendido = ftok("Encendido", 'n');
+   semaforo_encendido = obtiene_semaforo(llave_encendido);
+   up(semaforo_encendido);
 
    /***************************************************/
    /*     Semáforo Mutex para el paso al servidor     */
    /***************************************************/
    key_t llave_mutex = ftok("Mutex", 'k'); 
-   semaforo_mutex = crea_semaforo(llave_mutex, 1);
+   semaforo_mutex = obtiene_semaforo(llave_mutex);
    down(semaforo_mutex);     
 
    llave2 = ftok("Prueba2", 'l'); 
