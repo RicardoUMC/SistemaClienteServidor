@@ -98,16 +98,12 @@ int main(void)
 
    llave_encendido = ftok("Encendido", 'n');
    semaforo_encendido = crea_semaforo(llave_encendido, 0);
-   up(semaforo_encendido);
 
    /***************************************************/
    /*     Semáforo Mutex para el paso al servidor     */
    /***************************************************/
    key_t llave_mutex = ftok("Mutex", 'k'); 
    semaforo_mutex = crea_semaforo(llave_mutex, 1);
-   printf("Empieza mutex...\n");
-   down(semaforo_mutex);     
-   printf("Termina mutex...\n");
 
    llave2 = ftok("Prueba2", 'l'); 
    semaforo_espacio = crea_semaforo(llave2,N);
@@ -118,6 +114,13 @@ int main(void)
    
    int llave_stop = ftok("PruebaStop", 'p'); 
    int semaforo_stop = crea_semaforo(llave_stop, 1);
+   
+   down(semaforo_encendido); //Enciende al servidor
+   
+   // PROBLEMAS CON LOS SEMÁFOROS
+   printf("Empieza mutex...\n");
+   down(semaforo_mutex);     
+   printf("Termina mutex...\n");
    printf("Inicia stop...\n");
    down(semaforo_stop);         
    printf("Termina stop...\n");
