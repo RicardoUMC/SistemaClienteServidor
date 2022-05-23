@@ -16,26 +16,25 @@
  */
 typedef int sem_t;
 
-int crea_semaforo(key_t llave,int valor_inicial)
+int crea_semaforo(key_t llave, int valor_inicial)
 {
-   int semid=semget(llave,1,IPC_CREAT|PERMISOS);
-   if(semid==-1)
+   int semid = semget(llave, 1, IPC_CREAT|PERMISOS);
+   if(semid == -1)
    {
       return -1;
    }
-   semctl(semid,0,SETVAL,valor_inicial);
+   semctl(semid, 0, SETVAL, valor_inicial);
    return semid;
 }
 
 int obtiene_semaforo(key_t llave)
 {
-   int semid=semget(llave,1,IPC_CREAT|PERMISOS);
-   if(semid==-1)
+   int semid = semget(llave, 1, IPC_CREAT|PERMISOS);
+   if(semid == -1)
    {
       return -1;
    }
-   semctl(semid,0,GETVAL,NULL);
-   printf("\nValor del semáforo: %d\n", semid);
+   printf("\nValor del semáforo (obtiene): %d\n", semid);
    return semid;
 }
 
@@ -98,15 +97,17 @@ int main(void)
    key_t llave2, llave3, llave_encendido;
 
    llave_encendido = ftok("Encendido", 'n');
-   semaforo_encendido = obtiene_semaforo(llave_encendido);
+   semaforo_encendido = crea_semaforo(llave_encendido, 0);
    up(semaforo_encendido);
 
    /***************************************************/
    /*     Semáforo Mutex para el paso al servidor     */
    /***************************************************/
    key_t llave_mutex = ftok("Mutex", 'k'); 
-   semaforo_mutex = obtiene_semaforo(llave_mutex);
+   semaforo_mutex = crea_semaforo(llave_mutex, 1);
+   printf("Empieza mutex...\n");
    down(semaforo_mutex);     
+   printf("Termina mutex...\n");
 
    llave2 = ftok("Prueba2", 'l'); 
    semaforo_espacio = crea_semaforo(llave2,N);
@@ -117,7 +118,9 @@ int main(void)
    
    int llave_stop = ftok("PruebaStop", 'p'); 
    int semaforo_stop = crea_semaforo(llave_stop, 1);
+   printf("Inicia stop...\n");
    down(semaforo_stop);         
+   printf("Termina stop...\n");
 
    boletos_cantidad = ComprarBoletos(*asientos);
    *asientos = *asientos - boletos_cantidad;

@@ -78,8 +78,9 @@ int main(void)
     * para que los clientes solo accedan al valor que 
     * se tenga en ese momento.
     */
-   key_t llave_mutex = ftok("Mutex", 'k'); 
-   semaforo_mutex = crea_semaforo(llave_mutex, 1);
+   // key_t llave_mutex = ftok("Mutex", 'k'); 
+   // semaforo_mutex = crea_semaforo(llave_mutex, 1);
+   // printf("\nValor del mutex: %d\n", semaforo_mutex);
 
    /***************************************************/
    /*  Memoria compartida para cantidad de asientos   */
