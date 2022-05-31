@@ -93,8 +93,9 @@ int main(void)
 
    llave_encendido = ftok("Encendido", 'n');
    semaforo_encendido = crea_semaforo(llave_encendido, 0);
-   // int llave_stop = ftok("PruebaStop", 'p'); 
-   // int semaforo_stop = crea_semaforo(llave_stop, 0);
+   
+   key_t llave_stop = ftok("Detiene", 'p'); 
+   sem_t semaforo_stop = crea_semaforo(llave_stop, 0);
    
    while (1)
    {
@@ -111,6 +112,6 @@ int main(void)
       // printf("\nTermina cliente...\n");
       pthread_join(id_hilo1, NULL);
       printf("\nHilo finalizado...\n-----------------------------------------------------------------\n");
-      // down(semaforo_encendido);
+      down(semaforo_stop);
    }
 }
