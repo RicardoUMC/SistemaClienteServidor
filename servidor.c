@@ -17,14 +17,14 @@
  */
 typedef int sem_t;
 
-int crea_semaforo(key_t llave,int valor_inicial)
+int crea_semaforo(key_t llave, int valor_inicial)
 {
-   int semid=semget(llave,1,IPC_CREAT|PERMISOS);
-   if(semid==-1)
+   int semid = semget(llave, 1, IPC_CREAT|PERMISOS);
+   if(semid == -1)
    {
       return -1;
    }
-   semctl(semid,0,SETVAL,valor_inicial);
+   semctl(semid, 0, SETVAL, valor_inicial);
    return semid;
 }
 
@@ -78,57 +78,39 @@ int main(void)
     * para que los clientes solo accedan al valor que 
     * se tenga en ese momento.
     */
-   key_t llave_mutex = ftok("Mutex", 'k'); 
-   semaforo_mutex = crea_semaforo(llave_mutex, 1);
-   down(semaforo_mutex);
-   printf("\nValor del mutex: %d\n", semaforo_mutex);
+   // key_t llave_mutex = ftok("Mutex", 'k'); 
+   // semaforo_mutex = crea_semaforo(llave_mutex, 1);
+   // down(semaforo_mutex);
+   // printf("\nValor del mutex: %d\n", semaforo_mutex);
 
    /***************************************************/
    /*  Memoria compartida para cantidad de asientos   */
    /***************************************************/
-   llave3 = ftok("Prueba3", 'o');
-   memoria1 = shmget(llave3, sizeof(int), IPC_CREAT|0600);
-   asientos = shmat(memoria1, 0, 0);
-   *asientos = N;
+   // llave3 = ftok("Prueba3", 'o');
+   // memoria1 = shmget(llave3, sizeof(int), IPC_CREAT|0600);
+   // asientos = shmat(memoria1, 0, 0);
+   // *asientos = N;
 
    llave_encendido = ftok("Encendido", 'n');
    semaforo_encendido = crea_semaforo(llave_encendido, 0);
-   int llave_stop = ftok("PruebaStop", 'p'); 
-   int semaforo_stop = crea_semaforo(llave_stop, 0);
+   // int llave_stop = ftok("PruebaStop", 'p'); 
+   // int semaforo_stop = crea_semaforo(llave_stop, 0);
    
    while (1)
    {
       printf("\nServidor dormido (1)...\n");
       down(semaforo_encendido);
-      up(semaforo_mutex);
 
       pthread_t id_hilo1;
 
       printf("\nCreacion del hilo...\n");
       pthread_create(&id_hilo1, NULL, Hilo1, NULL);
-      printf("\nHilo creado. Esperando su finalizacion...\n");
-      printf("\nEsperando cliente...\n");
-      down(semaforo_stop);
-      printf("\nTermina cliente...\n");
+      // printf("\nHilo creado. Esperando su finalizacion...\n");
+      // printf("\nEsperando cliente...\n");
+      // down(semaforo_stop);
+      // printf("\nTermina cliente...\n");
       pthread_join(id_hilo1, NULL);
       printf("\nHilo finalizado...\n-----------------------------------------------------------------\n");
+      // down(semaforo_encendido);
    }
-   
-   /*
-   while (1)
-   {
-      printf("Servidor dormido...\n");
-      down(semaforo_encendido);
-      printf("Servidor despierto...\n");
-      pthread_t id_hilo1;
-      printf("\nCreacion del hilo...\n");
-      pthread_create(&id_hilo1, NULL, Hilo1, NULL);
-      printf("\nHilo creado. Esperando su finalizacion...\n");
-      printf("\nEsperando cliente...\n");
-      down(semaforo_stop);
-      printf("\nTermina cliente...\n");
-      pthread_join(id_hilo1, NULL);
-      printf("\nHilo finalizado...\n-----------------------------------------------------------------\n");
-   }
-   */   
 }

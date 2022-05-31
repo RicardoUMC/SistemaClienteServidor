@@ -44,6 +44,19 @@ int main(void)
     int memoria1, *asientos;
     int semaforo_estado;
     key_t llave3, llave_estado;
+    
+    /***************************************************/
+   /*            Inicialización del Mutex             */
+   /***************************************************/
+   /*
+    * Es necesario que el servidor inicialice el mutex
+    * para que los clientes solo accedan al valor que 
+    * se tenga en ese momento.
+    */
+   // key_t llave_mutex = ftok("Mutex", 'k'); 
+   // semaforo_mutex = crea_semaforo(llave_mutex, 1);
+   // down(semaforo_mutex);
+   // printf("\nValor del mutex: %d\n", semaforo_mutex);
 
     /***************************************************/
    /*  Memoria compartida para cantidad de asientos   */

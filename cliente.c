@@ -96,41 +96,51 @@ int main(void)
    sem_t semaforo_mutex, semaforo_encendido, semaforo_espacio, memoria1;
    key_t llave2, llave3, llave_encendido;
 
+
+   /**************************************************/
+   /*              Enciende al servidor              */
+   /**************************************************/
    llave_encendido = ftok("Encendido", 'n');
    semaforo_encendido = crea_semaforo(llave_encendido, 0);
+   up(semaforo_encendido); //Enciende al servidor
+
 
    /***************************************************/
    /*     Semáforo Mutex para el paso al servidor     */
    /***************************************************/
-   key_t llave_mutex = ftok("Mutex", 'k'); 
-   semaforo_mutex = crea_semaforo(llave_mutex, 1);
+   // key_t llave_mutex = ftok("Mutex", 'k'); 
+   // semaforo_mutex = crea_semaforo(llave_mutex, 1);
+   printf("Cliente...\n");
 
-   llave2 = ftok("Prueba2", 'l'); 
-   semaforo_espacio = crea_semaforo(llave2,N);
+
+   // llave2 = ftok("Prueba2", 'l'); 
+   // semaforo_espacio = crea_semaforo(llave2,N);
    
-   llave3 = ftok("Prueba3", 'o');
-   memoria1 = shmget(llave3, sizeof(int), IPC_CREAT|0600);
-   asientos = shmat(memoria1, 0, 0);
+   // llave3 = ftok("Prueba3", 'o');
+   // memoria1 = shmget(llave3, sizeof(int), IPC_CREAT|0600);
+   // asientos = shmat(memoria1, 0, 0);
    
-   int llave_stop = ftok("PruebaStop", 'p'); 
-   int semaforo_stop = crea_semaforo(llave_stop, 1);
+   // int llave_stop = ftok("PruebaStop", 'p'); 
+   // int semaforo_stop = crea_semaforo(llave_stop, 1);
    
-   down(semaforo_encendido); //Enciende al servidor
    
+   sleep(5);
+   // down(semaforo_mutex);
+   printf("Hola\n");
+
    // PROBLEMAS CON LOS SEMÁFOROS
-   printf("Empieza mutex...\n");
-   down(semaforo_mutex);     
-   printf("Termina mutex...\n");
-   printf("Inicia stop...\n");
-   down(semaforo_stop);         
-   printf("Termina stop...\n");
+   // printf("Termina mutex...\n");
+   // printf("Inicia stop...\n");
+   // down(semaforo_stop);         
+   // printf("Termina stop...\n");
 
-   boletos_cantidad = ComprarBoletos(*asientos);
-   *asientos = *asientos - boletos_cantidad;
-   for (i = 0; i < boletos_cantidad; i++)
-   {
-      down(semaforo_espacio);
-   }
-   up(semaforo_stop);
-   up(semaforo_mutex);
+   // boletos_cantidad = ComprarBoletos(*asientos);
+   // *asientos = *asientos - boletos_cantidad;
+   // for (i = 0; i < boletos_cantidad; i++)
+   // {
+   //    down(semaforo_espacio);
+   // }
+   // up(semaforo_stop);
+   // up(semaforo_mutex);
+   // up(semaforo_encendido); //Enciende al servidor
 }
